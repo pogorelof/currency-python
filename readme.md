@@ -16,3 +16,4 @@ user: airflow
 database: airflow
 password: airflow
 ```
+5) Data is added to the table: **currency**
