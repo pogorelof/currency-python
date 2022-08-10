@@ -37,7 +37,7 @@ def transform(**kwargs):
 
 with DAG(
     dag_id = "currency",
-    schedule_interval = "20 10-21 * * MON-FRI",
+    schedule_interval = "*/20 10-21 * * MON-FRI",
     default_args = args,
     catchup=False
     ) as f:
