@@ -18,13 +18,16 @@ services:
         max-file: '3'
 
   webserver:
-    build: ./dockerfiles
+    image: puckel/docker-airflow:latest
     restart: always
     depends_on: 
       - postgres
     environment:
       - LOAD_EX=n
       - EXECUTOR=Local
+      - AIRFLOW__CORE__FERNET_KEY=PK2rDMMDLhpIwlbbi-gsc4-_kOSaRSbRUYxbB3c4g_Q=
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
     logging:
       options:
         max-size: 10m
@@ -33,7 +36,9 @@ services:
       - ./dags:/usr/local/airflow/dags
     ports: 
       - 8080:8080
-    command: webserver
+    command: 
+      - webserver 
+      - bash -c "airflow initdb"
     healthcheck:
       test: ["CMD-SHELL", "[ -f /use/local/airflow/airflow-webserver.pid "]
       interval: 30s
