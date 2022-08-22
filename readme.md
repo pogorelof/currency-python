@@ -1,5 +1,5 @@
 # Currency
-This application shows the data of three currencies: KZT, RUB and BTC. Fresh data is added to the table every 20 minutes from Monday to Friday from 10:00 to 21:00.
+This application collects the data of three currencies: KZT, RUB and BTC. Fresh data is added to the table every 20 minutes from Monday to Friday from 10:00 to 21:00.
 
 ## Launch
 You need Docker to run and PostgreSQL. <br>
@@ -20,3 +20,8 @@ password: airflow
 ```
 6) Data is added to the table: **currency** <br>
 ``select * from currency ``
+7) Second table **quotation** shows target/base currency and their ratio <br>
+``select * from quotation ``
+```
+The second table takes data from the first table, so you need to run the first "currency" dag first
+```
