@@ -22,6 +22,3 @@ password: airflow
 ``select * from currency ``
 7) Second table **quotation** shows target/base currency and their ratio <br>
 ``select * from quotation ``
-```
-The second table takes data from the first table, so you need to run the first "currency" dag first
-```
