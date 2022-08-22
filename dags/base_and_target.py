@@ -1,6 +1,3 @@
-from urllib import response
-import requests
-import json
 import psycopg2
 from psycopg2 import sql
 from datetime import timedelta, datetime
