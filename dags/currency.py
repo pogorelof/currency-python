@@ -41,17 +41,21 @@ def transform(**kwargs):
     list_to_db.append(tuple(("BTC", "EUR", json_from_api['BTC'])))
     ti.xcom_push(key = 'list_db', value = list_to_db)
 
-
-def insert_in_table(**kwargs):
+def insert_in_table_currency(**kwargs):
     ti = kwargs['ti']
     conn = psycopg2.connect(database="airflow", user="airflow", password="airflow", host="postgres", port="5432")
     conn.autocommit = True
     cursor = conn.cursor()
-    #1 таблица 
     json_to_db = ti.xcom_pull(key='json_db', task_ids='transform_data')
     insert = f"INSERT INTO currency(json, date) VALUES('{ json_to_db }', current_timestamp);"
     cursor.execute(insert)
-    #2 таблица
+    conn.close()
+
+def insert_in_table_quotation(**kwargs):
+    ti = kwargs['ti']
+    conn = psycopg2.connect(database="airflow", user="airflow", password="airflow", host="postgres", port="5432")
+    conn.autocommit = True
+    cursor = conn.cursor()
     list_to_db = ti.xcom_pull(key='list_db', task_ids='transform_data')
     insert = sql.SQL("INSERT INTO quotation (convert, base, rate) VALUES {}").format(
         sql.SQL(",").join(map(sql.Literal, list_to_db))
@@ -67,7 +71,8 @@ with DAG(
     ) as f:
     extract = PythonOperator(task_id = 'extract_data', python_callable = extract,)
     transform = PythonOperator(task_id = 'transform_data', python_callable = transform,)
-    insert_in_table = PythonOperator(task_id = "insert_in_table", python_callable = insert_in_table)
+    insert_in_table_currency = PythonOperator(task_id = "insert_in_table_currency", python_callable = insert_in_table_currency)
+    insert_in_table_quotation = PythonOperator(task_id = "insert_in_table_quotation", python_callable = insert_in_table_quotation)
     create_table = PostgresOperator(
         task_id = 'create_table',
         postgres_conn_id = 'datapg',
@@ -86,4 +91,4 @@ with DAG(
                 );
         """,
         )
-    extract >> transform >> create_table >> insert_in_table
+    extract >> transform >> create_table >> insert_in_table_currency >> insert_in_table_quotation
